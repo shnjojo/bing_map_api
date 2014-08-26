@@ -89,8 +89,8 @@ var place = {
 		raw_data = [];
 	},
 	
-	setPlacesid: function () {
-		places_id = [];
+	setPlacesid: function (new_place_id) {
+		this.places_id.push(new_place_id);
 	},
 	
 	getPlacesid: function () {
@@ -126,6 +126,8 @@ var place = {
 			
 			var raw_place_id = v.id;
 			var exist_places_id = content_class.getPlacesid();
+			console.log('/////////////////');
+			console.log(exist_places_id);
 			var counter = exist_places_id.length;
 			// to make sure get the new data by the id of implement.
 			var current_place_counter_id = k;
