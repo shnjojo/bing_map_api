@@ -40,11 +40,6 @@ var mapOptions = {
 	center: getLocationFromURL()
 };
 
-function initPlaces(current_location) {
-	var current_pin = new Microsoft.Maps.Pushpin(new Microsoft.Maps.Location(lax,lng), pinOptions(type, content));
-	map.entities.push(current_pin);
-}
-
 function getViewBound(map) {
 	var bound = map.getBounds();
 	var bound_arr = {}
@@ -58,26 +53,20 @@ function getViewBound(map) {
 // Define a Class to control the places data from server to client.
 var place = {
 	
-	/////////////////
-	// Some Dummy here
-	/////////////////
+	////////////////////////////////////////
+	// Some Dummy data here, should be empty
+	////////////////////////////////////////
 	
 	// places hold all the places data once fetch from server.
 	places: [{
 		id: "1",
 		name: "Ryan's Home",
 		address: "Under the bridge",
-		type: "red",
-		location: {latitude: "52.4671044", longitude: "-1.9045764"}
-	}, {
-		id: "2",
-		name: "Will's Home",
-		address: "Under the ground",
 		type: "blue",
-		location: {latitude: "52.4681044", longitude: "-1.9035764"}
+		location: {latitude: "52.4671044", longitude: "-1.9045764"}
 	}],
 	// places_id hold all the places id once fetch from server.
-	places_id: ["1", "2"],
+	places_id: ["1"],
 	// raw_data hold all data fetch from server, empty before each function.
 	raw_data: [],
 	
@@ -90,23 +79,45 @@ var place = {
 	},
 	
 	setPlacesid: function (new_place_id) {
+    console.log('Set place id here:');
+    console.log(new_place_id);
 		this.places_id.push(new_place_id);
 	},
 	
 	getPlacesid: function () {
 		return this.places_id;
 	},
+  
+	setPlaces: function (new_places) {
+    console.log('Set places here:');
+    console.log(new_places);
+		this.places.push(new_places);
+	},
+  
+  getPlaces: function (place_id) {
+    
+    var places = this.places;
+    var place_info = null;
+    
+    $.each(places, function( k, v ) {
+      var current_place_id = v.id;
+      if (place_id === current_place_id) {
+        place_info = places[k];
+      }
+    });
+    
+    return place_info;
+    
+  },
 	
 	// append new places data and append the new places id.
 	appendNewplaces: function (new_places_data) {
-		this.places.push(new_places_data);
-		var places_id = this.getPlacesid();
-		
-		$.each(new_places_data, function( k, v ) {
-			places_id.push(v.id);
-		})
-		
-		console.log(places_id);
+    
+    // Append new place data into places
+		this.setPlaces(new_places_data);
+    // Append new place id into places_id
+    this.setPlacesid(new_places_data.id)
+    
 	},
 	
 	// get data from server and set
@@ -126,10 +137,8 @@ var place = {
 			
 			var raw_place_id = v.id;
 			var exist_places_id = content_class.getPlacesid();
-			console.log('/////////////////');
-			console.log(exist_places_id);
 			var counter = exist_places_id.length;
-			// to make sure get the new data by the id of implement.
+			// to mark which is the new places
 			var current_place_counter_id = k;
 	
 			console.log('All data from server: ' + raw_place_id);
@@ -160,9 +169,10 @@ var place = {
 	},
 
 	// Generate the pins content
-	pinOptions: function (type, name, address){
+	pinOptions: function (id, type, name, address){
 		var dict = {
-			htmlContent: '<p class="pinContent ' + type + '">' + 'Name: ' + name + 'Address: ' + address + '</p>'
+			htmlContent: '<p class="pinContent ' + type + '">' + 'Name: ' + name + 'Address: ' + address + '</p>',
+      text: id
 		};
 	
 		return dict;
@@ -177,15 +187,38 @@ var place = {
 		var pins_collection = new Microsoft.Maps.EntityCollection();
 		
 		$.each(places, function( k, v ) {
+      var id = v.id;
 		  var name = v.name;
 			var address = v.address;
 			var type = v.type;
+      var pic = v.pic;
 			var lat = v.location['latitude'];
 			var lng = v.location['longitude'];
+      
 			var location = new Microsoft.Maps.Location(lat,lng)
 			// new a pin and push into collection
-			var pin_options = content_class.pinOptions(type, name, address);
+			var pin_options = content_class.pinOptions(id, type, name, address);
 			var current_pin = new Microsoft.Maps.Pushpin(location, pin_options);
+
+      function displayInfo(e) {
+        var id = e.target.getText();
+        var data = content_class.getPlaces(id);
+        var title = data.name;
+        var address = data.address;
+        
+        $('#accommodation_pic').css("display", "none");
+        $('#infoWindow #title').text(title);
+        $('#infoWindow #address').text(address);
+        
+        if (!(data.pic === "" || data.pic === undefined)) {
+          $('#accommodation_pic').attr( "src", data.pic )
+          $('#accommodation_pic').css("display", "block");
+          
+        }
+      }
+      
+      Microsoft.Maps.Events.addHandler(current_pin, 'click', displayInfo);
+      
 			pins_collection.push(current_pin);
 		});
 		
@@ -193,31 +226,49 @@ var place = {
 		
 	},
 	
+};
+
+/*
+
+Some bug need to fix, but alway got a dirty way to do the job...
+
+var infoWindow = {
+  
+	title: $('#infoWindow #title'),
+  address: $('#infoWindow #address'),
+	
+	setTitle: function (new_title) {
+    title.text(new_title);
+	},
+  
+	setAddress: function (new_address) {
+		address.text(new_address);
+	}
+  
 }
+*/
 
 // initialize the map
 function GetMap(){
+  
   var map = new Microsoft.Maps.Map(document.getElementById("map"), mapOptions);
-	
-	// initPlaces();
-	// var current_accommodation = {};
-	// current_accommodation['LaxLng'] = getLocationFromURL();
-	
-	// var center = map.getCenter();
-  // var current_pin = new Microsoft.Maps.Pushpin(center, pinOptions); 
+  
   // Add handler for the pushpin click event.
   // Microsoft.Maps.Events.addHandler(current_pin, 'click', someTest);
 	
-	// Get all places inside the view from post the bound to server when the view is changed.
+	// Get all places info and pin on map inside the view from
+  // post the bound to server when the view is changed.
 	Microsoft.Maps.Events.addHandler(map, 'viewchangeend', function(e){
 		
 		var bound = getViewBound(map);
 		
 		$.post( "/map", JSON.stringify(bound), function( data ) {
+      
 			place.init(data);
 			place.filterOldInsertNew();
 			var all_pins = place.setPins();
 			map.entities.push(all_pins);
+      
 		});
 		
 	});
