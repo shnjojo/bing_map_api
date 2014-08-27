@@ -102,40 +102,34 @@ var place = {
 	
 	// search place by a key and a value, return the target object.
 	// only call it when the places was updated
-	searchPlaces: function (param_key, param_value) {
-		
+	getPlaceByLaxlng: function (param_object) {
+    
+    var lax = param_object.value.latitude;
+    var lng = param_object.value.longitude;
 		var places = this.places;
-		var found = false;
-		var flag = '';
+    var flag = '';
 		
 		$.each(places, function( k, v ) {
 			
-			$.each(v, function( key, value ) {
+			var places_lax = v.location.latitude;
+      var places_lng = v.location.longitude;
 			
-				if (param_key === key && param_value === value) {
-					found = true;
-					return false;
-				}
-				
-			});
-			
-			if (found) {
-				flag = k;
-				return false;
-			};
+      if (places_lax === lax && places_lng === lng) {
+        flag = k;
+        return false;
+      }
 			
 		});
-		
-		return flag;
+    
+    return flag;
 		
 	},
 	
-	setPlace: function (param_key, param_value, update_key, update_value) {
-		
-		var update_place_id = this.searchPlaces(param_key, param_value);
-		var update_place = this.places[update_place_id];
+	setPlace: function (places_id, update_key, update_value) {
+    
+		var update_place = this.places[places_id];
 		update_place[update_key] = update_value;
-		
+    
 	},
   
   getPlaces: function (place_id) {
@@ -160,8 +154,15 @@ var place = {
 		var location = getLocationFromURL();
 		var location_lax = location[0];
 		var location_lng = location[1];
-		
-		this.searchPlaces();
+    
+    var location_laxlng = {
+      key: 'location', 
+      value: {latitude: location_lax, longitude: location_lng}
+    };
+    
+		var id = this.getPlaceByLaxlng(location_laxlng);
+    
+    return id;
 		
 	},
 	
@@ -221,7 +222,7 @@ var place = {
 		// Flag the current accommodation
 		var matched_id = content_class.findThisAccommodation();
 
-		// this.setPlace('id',matched_id, 'type', 'current_property');
+		this.setPlace(matched_id, 'type', 'current_property');
 		this.emptyRawdata();
 		
 	},
@@ -230,11 +231,13 @@ var place = {
 	pinOptions: function (id, type, name){
 		
 		var html = '';
-		if (type === "property" || type === "university") {
+		if (type === "current_property" || type === "university") {
 			html = '<div class="pinContent ' + type + '"><p>' + name + '</p><div class="pinFoot"></div></div>';
+		} else if (type === "property") {
+			html = '<div class="' + type + '"></div>';
 		} else {
-			html = '<div class="pinContent ' + type + '"><p></p><div class="pinFoot"></div></div>';
-		}
+      html = '<div class="pinContent ' + type + '"><p></p><div class="pinFoot"></div></div>';
+    }
 		
 		var dict = {
 			htmlContent: html,
@@ -325,19 +328,19 @@ function initMap(){
 		});
 		
 	});
+  
+  var zoomLv = map.getZoom();
 	
 	$('#zoomIn').click(function() {
-  	//get current zoom level
-		var zoomLv = map.getZoom();
 		//raise the zoom level
 		map.setView({zoom:zoomLv+1});
+    zoomLv = zoomLv + 1;
 	});
 	
 	$('#zoomOut').click(function() {
-  	//get current zoom level
-		var zoomLv = map.getZoom();
 		//raise the zoom level
 		map.setView({zoom:zoomLv-1});
+    zoomLv = zoomLv - 1;
 	});
 	
 }

@@ -58,6 +58,20 @@ body {
 	position: relative;
 	left: -50%;
 }
+.property {
+	height: 17px;
+  width: 17px;
+  border-radius: 15px;
+  border: 3px solid #ffb86b;
+	background-color: #FF931E;
+	background-image: url('icons_property.png');
+  background-position: 3px center;
+  background-repeat: no-repeat;
+	position: relative;
+	left: -50%;
+  /* For fix a tricky Custom Pushpin bug */
+  pointer-events: all;
+}
 .pinContent p {
 	font-size: 0.75em;
 	height: 26px;
@@ -122,6 +136,15 @@ body {
 	width: 34px;
 	background-position: 8px center;
 	padding: 0;
+}
+.pinContent.current_property .pinFoot {
+	background-image: url('accommodation_pinfoot.png');
+}
+.pinContent.current_property p {
+	background-color: #FF931E;
+	background-image: url('icons_property.png');
+	background-size: 11px 12px;
+	padding: 0 8px 0 25px;
 }
 .pinContent.property .pinFoot {
 	background-image: url('accommodation_pinfoot.png');
