@@ -18,8 +18,8 @@ function getLocationFromURL() {
 	var raw_url = $(location).attr('href');
 	var url_after_slash = splitUrl(raw_url, '/');
 	var url_after_sharp = splitUrl(url_after_slash, '#');
-	var laxlng = splitUrl(url_after_sharp, ',', true);
-	return new Microsoft.Maps.Location(laxlng[0],laxlng[1])
+	var laxlngzoom = splitUrl(url_after_sharp, ',', true);
+	return laxlngzoom
 }
 
 
@@ -28,16 +28,22 @@ function getLocationFromURL() {
 // Map API Stuff
 /////////////////
 
+var url_params = getLocationFromURL();;
+var current_center_location = new Microsoft.Maps.Location(url_params[0],url_params[1]);
+
 var mapOptions = {
 	// Map Options: http://msdn.microsoft.com/en-us/library/gg427603.aspx
 	credentials: "AgxWecX8jqRQhxHLL113XSh1jGb1EeluxcaeSaJo4bowuOrm3sOPx3pSyZLimwLd",
 	enableClickableLogo: false,
 	enableSearchLogo: false,
 	showCopyright: false,
+	showScalebar: false,
+	showDashboard: false,
+	showMapTypeSelector: false,
 	
 	// View Options: http://msdn.microsoft.com/en-us/library/gg427628.aspx
-	zoom: 16,
-	center: getLocationFromURL()
+	zoom: parseInt(url_params[2]),
+	center: current_center_location
 };
 
 function getViewBound(map) {
@@ -62,7 +68,7 @@ var place = {
 		id: "1",
 		name: "Ryan's Home",
 		address: "Under the bridge",
-		type: "blue",
+		type: "property",
 		location: {latitude: "52.4671044", longitude: "-1.9045764"}
 	}],
 	// places_id hold all the places id once fetch from server.
@@ -71,11 +77,11 @@ var place = {
 	raw_data: [],
 	
 	setRawdata: function (data) {
-		raw_data = data;
+		this.raw_data = data;
 	},
 	
 	emptyRawdata: function () {
-		raw_data = [];
+		this.raw_data = [];
 	},
 	
 	setPlacesid: function (new_place_id) {
@@ -92,6 +98,44 @@ var place = {
     console.log('Set places here:');
     console.log(new_places);
 		this.places.push(new_places);
+	},
+	
+	// search place by a key and a value, return the target object.
+	// only call it when the places was updated
+	searchPlaces: function (param_key, param_value) {
+		
+		var places = this.places;
+		var found = false;
+		var flag = '';
+		
+		$.each(places, function( k, v ) {
+			
+			$.each(v, function( key, value ) {
+			
+				if (param_key === key && param_value === value) {
+					found = true;
+					return false;
+				}
+				
+			});
+			
+			if (found) {
+				flag = k;
+				return false;
+			};
+			
+		});
+		
+		return flag;
+		
+	},
+	
+	setPlace: function (param_key, param_value, update_key, update_value) {
+		
+		var update_place_id = this.searchPlaces(param_key, param_value);
+		var update_place = this.places[update_place_id];
+		update_place[update_key] = update_value;
+		
 	},
   
   getPlaces: function (place_id) {
@@ -110,14 +154,23 @@ var place = {
     
   },
 	
+	// Find first accommodation.
+	findThisAccommodation: function () {
+		
+		var location = getLocationFromURL();
+		var location_lax = location[0];
+		var location_lng = location[1];
+		
+		this.searchPlaces();
+		
+	},
+	
 	// append new places data and append the new places id.
 	appendNewplaces: function (new_places_data) {
-    
     // Append new place data into places
 		this.setPlaces(new_places_data);
     // Append new place id into places_id
     this.setPlacesid(new_places_data.id)
-    
 	},
 	
 	// get data from server and set
@@ -131,9 +184,10 @@ var place = {
 		
 		// Define main class for some scope reason.
 		var content_class = this;
+		var r_data = this.raw_data;
 		
 		// Implement the raw places data
-		$.each(raw_data, function( k, v ) {
+		$.each(r_data, function( k, v ) {
 			
 			var raw_place_id = v.id;
 			var exist_places_id = content_class.getPlacesid();
@@ -158,22 +212,41 @@ var place = {
 				if (counter === times) {
 					console.log('This place is not exist: ' + raw_place_id);
 					// append new data to places array
-					content_class.appendNewplaces(raw_data[current_place_counter_id]);
+					content_class.appendNewplaces(r_data[current_place_counter_id]);
 				}
 			});
 
 		});
 		
+		// Flag the current accommodation
+		var matched_id = content_class.findThisAccommodation();
+
+		// this.setPlace('id',matched_id, 'type', 'current_property');
 		this.emptyRawdata();
 		
 	},
 
 	// Generate the pins content
-	pinOptions: function (id, type, name, address){
+	pinOptions: function (id, type, name){
+		
+		var html = '';
+		if (type === "property" || type === "university") {
+			html = '<div class="pinContent ' + type + '"><p>' + name + '</p><div class="pinFoot"></div></div>';
+		} else {
+			html = '<div class="pinContent ' + type + '"><p></p><div class="pinFoot"></div></div>';
+		}
+		
 		var dict = {
-			htmlContent: '<p class="pinContent ' + type + '">' + 'Name: ' + name + 'Address: ' + address + '</p>',
-      text: id
+			htmlContent: html,
+      text: id,
+			anchor: getAnchor()
 		};
+		
+		// Set the offset of Y index
+		function getAnchor() {
+			var test = $('.pinContent').text();
+			return new Microsoft.Maps.Point(0, 33)
+		}
 	
 		return dict;
 	},
@@ -206,6 +279,7 @@ var place = {
         var title = data.name;
         var address = data.address;
         
+				$('#infoWindow').css("display", "block");
         $('#accommodation_pic').css("display", "none");
         $('#infoWindow #title').text(title);
         $('#infoWindow #address').text(address);
@@ -228,33 +302,10 @@ var place = {
 	
 };
 
-/*
-
-Some bug need to fix, but alway got a dirty way to do the job...
-
-var infoWindow = {
-  
-	title: $('#infoWindow #title'),
-  address: $('#infoWindow #address'),
-	
-	setTitle: function (new_title) {
-    title.text(new_title);
-	},
-  
-	setAddress: function (new_address) {
-		address.text(new_address);
-	}
-  
-}
-*/
-
 // initialize the map
-function GetMap(){
+function initMap(){
   
   var map = new Microsoft.Maps.Map(document.getElementById("map"), mapOptions);
-  
-  // Add handler for the pushpin click event.
-  // Microsoft.Maps.Events.addHandler(current_pin, 'click', someTest);
 	
 	// Get all places info and pin on map inside the view from
   // post the bound to server when the view is changed.
@@ -267,13 +318,30 @@ function GetMap(){
 			place.init(data);
 			place.filterOldInsertNew();
 			var all_pins = place.setPins();
+			// Remove all pins and set new pins collection.
+			map.entities.clear();
 			map.entities.push(all_pins);
       
 		});
 		
 	});
+	
+	$('#zoomIn').click(function() {
+  	//get current zoom level
+		var zoomLv = map.getZoom();
+		//raise the zoom level
+		map.setView({zoom:zoomLv+1});
+	});
+	
+	$('#zoomOut').click(function() {
+  	//get current zoom level
+		var zoomLv = map.getZoom();
+		//raise the zoom level
+		map.setView({zoom:zoomLv-1});
+	});
+	
 }
 
 $(function() {
-  GetMap()
+  initMap()
 });

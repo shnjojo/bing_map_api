@@ -20,6 +20,7 @@ post '/map' do
   @leo = Hash.new
   @sergey = Hash.new
   @john = Hash.new
+  @school = Hash.new
   @places = Array.new
   
   # Bound from client
@@ -32,43 +33,50 @@ post '/map' do
   @ryan["id"] = "1"
   @ryan["name"] = "Ryan's Home"
   @ryan["address"] = "Under the bridge"
-  @ryan["type"] = "blue"
+  @ryan["type"] = "property"
   @ryan["pic"] = ""
   @ryan["location"] = {latitude: "52.4671044", longitude: "-1.9045764"}
   
   @will["id"] = "2"
   @will["name"] = "Will's Home"
   @will["address"] = "Under the ground"
-  @will["type"] = "blue"
+  @will["type"] = "pharmacy"
   @will["pic"] = ""
   @will["location"] = {latitude: "52.4681044", longitude: "-1.9035764"}
   
   @leo["id"] = "3"
   @leo["name"] = "Leo's Home"
   @leo["address"] = "Homeless"
-  @leo["type"] = "blue"
+  @leo["type"] = "university"
   @leo["pic"] = ""
   @leo["location"] = {latitude: "52.4691044", longitude: "-1.9025764"}
   
   @sergey["id"] = "4"
   @sergey["name"] = "Sergey's Home"
   @sergey["address"] = "With John"
-  @sergey["type"] = "blue"
+  @sergey["type"] = "supermarket"
   @sergey["pic"] = ""
   @sergey["location"] = {latitude: "52.4701044", longitude: "-1.9015764"}
   
   @john["id"] = "5"
   @john["name"] = "John's Home"
   @john["address"] = "With Sergey"
-  @john["type"] = "red"
+  @john["type"] = "mall"
   @john["pic"] = "pic.jpg"
   @john["location"] = {latitude: "52.4711044", longitude: "-1.9005764"}
+  
+  @school["id"] = "6"
+  @school["name"] = "London School of Hygiene and Tropical Medicine"
+  @school["address"] = "Keppel St, Bloomsbury, London WC1E 7HT"
+  @school["type"] = "university"
+  @school["location"] = {latitude: "52.4721044", longitude: "-1.8995764"}
   
   @places.push(@ryan)
   @places.push(@will)
   @places.push(@leo)
   @places.push(@sergey)
   @places.push(@john)
+  @places.push(@school)
   
   print @places
   

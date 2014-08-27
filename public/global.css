@@ -1,7 +1,9 @@
 * {
-margin: 0;
-padding: 0;
-font-size: 16px;
+	margin: 0;
+	padding: 0;
+	font-size: 16px;
+	font-family: Helvetica Neue;
+	line-height: 1.5em;
 }
 html {
 	height: 100%
@@ -12,40 +14,161 @@ body {
 	padding: 0
 }
 #infoWindow {
+	display: none;
 	position: absolute;
 	background: #fff;
-	padding: 10px;
-	left: 100px;
+	left: 20px;
 	top: 20px;
-	width: 200px;
-	height: 300px;
+	width: 290px;
 	z-index: 2;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	box-shadow: 0 1px rgba(200, 200, 200, 0.5);
+}
+#infoWindow .content {
+	padding: 8px 10px 10px 10px;
+	width: 270px;
 }
 #map {
 	width: 100%;
 	height: 100%;
 }
+#title {
+	font-size: 1.125em;
+	font-weight: bold;
+	line-height: 1.3em;
+	color: #4c4c4c;
+}
+#address {
+	margin-top: 2px;
+	font-size: 0.75em;
+	color: #aeaeae;
+}
 .MapPushpinBase {
-	background-color: #ff0!important;
+	display: block;
 	width: auto!important;
 	height: auto!important;
+	cursor: pointer!important;
+	width: auto!important;
 }
 .pinContent {
-	font-size: 0.75em;
-	padding: 5px;
+	height: 40px;
   /* For fix a tricky Custom Pushpin bug */
   pointer-events: all;
+	position: relative;
+	left: -50%;
 }
-.blue {
+.pinContent p {
+	font-size: 0.75em;
+	height: 26px;
 	color: #fff;
-	background-color: #000;
+	line-height: 26px;
+	padding: 0 8px;
+	white-space: nowrap;
+	border-radius: 3px;
+	box-shadow: 0 1px 1px rgba(112, 112, 112, 0.5);
+	background-repeat: no-repeat;
+	background-position: 8px center;
 }
-.red {
-	color: #000;
-	background-color: #fff;
+.pinFoot {
+	background-repeat: no-repeat;
+	background-size: 17px 14px;
+	margin: auto;
+	width: 17px;
+	height: 14px;
 }
+
+/* Different type */
+.pinContent.mall .pinFoot {
+	background-image: url('mall_pinfoot.png');
+}
+.pinContent.mall p {
+	background-color: #FFC900;
+	background-image: url('icons_mall.png');
+	background-size: 11px 15px;
+	width: 34px;
+	background-position: center;
+	padding: 0;
+}
+.pinContent.pharmacy .pinFoot {
+	background-image: url('pharmacy_pinfoot.png');
+}
+.pinContent.pharmacy p {
+	background-color: #00CD7F;
+	background-image: url('icons_pharmacy.png');
+	background-size: 16px 15px;
+	padding: 0 8px 0 23px;
+	width: 34px;
+	background-position: 10px center;
+	padding: 0;
+}
+.pinContent.university .pinFoot {
+	background-image: url('university_pinfoot.png');
+}
+.pinContent.university p {
+	background-color: #00A8EF;
+	background-image: url('icons_university.png');
+	background-size: 16px 12px;
+	padding: 0 8px 0 30px;
+}
+.pinContent.supermarket .pinFoot {
+	background-image: url('supermarket_pinfoot.png');
+}
+.pinContent.supermarket p {
+	background-color: #F14D4D;
+	background-image: url('icons_supermarket.png');
+	background-size: 17px 13px;
+	padding: 0 8px 0 25px;
+	width: 34px;
+	background-position: 8px center;
+	padding: 0;
+}
+.pinContent.property .pinFoot {
+	background-image: url('accommodation_pinfoot.png');
+}
+.pinContent.property p {
+	background-color: #FF931E;
+	background-image: url('icons_property.png');
+	background-size: 11px 12px;
+	padding: 0 8px 0 25px;
+}
+
 #accommodation_pic {
-  width: 180px;
-  height: 100px;
+  width: 290px;
+  height: 170px;
   display: none;
+}
+#zoomControl {
+	position: absolute;
+  background: linear-gradient(#fafafa, #f5f5f5);
+	right: 20px;
+	bottom: 20px;
+	width: 30px;
+	height: 61px;
+	z-index: 2;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	box-shadow: 0 1px rgba(200, 200, 200, 0.5);
+}
+#zoomControl p {
+	cursor: pointer;
+	height: 30px;
+	width: 30px;
+	background-repeat: no-repeat;
+	background-position: center; 
+}
+#zoomIn {
+	background-image: url('zoom_in.png');
+	background-size: 12px 12px;
+}
+#zoomOut {
+	background-image: url('zoom_out.png');
+	background-size: 12px 2px;
+}
+#line {
+	width: 20px;
+	height: 1px;
+	display: block;
+	margin: auto;
+	background-color: #d8d8d8;
 }
