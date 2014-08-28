@@ -329,18 +329,61 @@ function initMap(){
 		
 	});
   
-  var zoomLv = map.getZoom();
+	// Zoomer
+	var zoom_limit_max = 18;
+	var zoom_limit_min = 14;
+  var zoom_level = map.getZoom();
 	
-	$('#zoomIn').click(function() {
-		//raise the zoom level
-		map.setView({zoom:zoomLv+1});
-    zoomLv = zoomLv + 1;
+	// Init the zoomer status
+	if (zoom_level >= zoom_limit_max) {
+		$('#zoomOut').removeClass( "disable" );
+	}
+	if (zoom_level <= zoom_limit_min) {
+		$('#zoomIn').removeClass( "disable" );
+	}
+	if (zoom_level > zoom_limit_min && zoom_level < zoom_limit_max) {
+		$('#zoomIn').removeClass( "disable" );
+		$('#zoomOut').removeClass( "disable" );
+	}
+	
+	$('#zoomIn').click(function(){
+		
+		if (zoom_level < zoom_limit_max && zoom_level > zoom_limit_min) {
+			
+			map.setView({zoom:zoom_level+1});
+	    zoom_level = zoom_level + 1;
+			if (zoom_level === zoom_limit_max) {
+				$('#zoomIn').addClass("disable");
+			}
+			
+		} else if (zoom_level <= zoom_limit_min) {
+			
+			map.setView({zoom:zoom_level+1});
+	    zoom_level = zoom_level + 1;
+			$('#zoomOut').removeClass("disable");
+			
+		}
+		
 	});
 	
-	$('#zoomOut').click(function() {
-		//raise the zoom level
-		map.setView({zoom:zoomLv-1});
-    zoomLv = zoomLv - 1;
+	$('#zoomOut').click(function(){
+		
+		if (zoom_level >= zoom_limit_max) {
+			
+			map.setView({zoom:zoom_level-1});
+	    zoom_level = zoom_level - 1;
+			$('#zoomIn').removeClass("disable");
+			
+		} else if (zoom_level < zoom_limit_max && zoom_level > zoom_limit_min) {
+			
+			map.setView({zoom:zoom_level-1});
+	    zoom_level = zoom_level - 1;
+			if (zoom_level === zoom_limit_min) {
+				$('#zoomOut').addClass("disable");
+			}
+			
+		}
+		
 	});
 	
 }

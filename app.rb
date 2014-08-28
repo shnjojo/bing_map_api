@@ -47,7 +47,7 @@ post '/map' do
   @leo["id"] = "3"
   @leo["name"] = "Leo's Home"
   @leo["address"] = "Homeless"
-  @leo["type"] = "university"
+  @leo["type"] = "property"
   @leo["pic"] = ""
   @leo["location"] = {latitude: "52.4691044", longitude: "-1.9025764"}
   

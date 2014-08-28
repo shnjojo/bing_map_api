@@ -59,13 +59,13 @@ body {
 	left: -50%;
 }
 .property {
-	height: 17px;
-  width: 17px;
-  border-radius: 15px;
-  border: 3px solid #ffb86b;
+	height: 19px;
+  width: 19px;
+  border-radius: 19px;
+  border: 3px solid #F1D2A7;
 	background-color: #FF931E;
 	background-image: url('icons_property.png');
-  background-position: 3px center;
+  background-position: 4px 3px;
   background-repeat: no-repeat;
 	position: relative;
 	left: -50%;
@@ -154,6 +154,12 @@ body {
 	background-image: url('icons_property.png');
 	background-size: 11px 12px;
 	padding: 0 8px 0 25px;
+}
+/* Different type end*/
+
+#zoomControl .disable {
+	cursor: default;
+	opacity: 0.1;
 }
 
 #accommodation_pic {
